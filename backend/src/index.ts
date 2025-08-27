@@ -1,6 +1,8 @@
 import type { WebSocket } from "bun";
-import { db } from "./lib/db.js";
+import { client } from "./lib/db.js";
+
 async function main () {
+    await client.connect();
     const ws = new WebSocket("wss://fstream.binance.com/stream?streams=btcusdt@aggTrade");
     ws.onopen = () => {
         console.log("connected");
@@ -14,14 +16,12 @@ async function main () {
     
     setInterval(async () => {
         // push data to db
-        await db.trade.createMany({
-            data : data.map(d => ({
-                symbol : d.data.s,
-                price : d.data.p,
-                qty : d.data.q,
-                Time : d.data.T
-            })),
-        })
+        const query = `
+  INSERT INTO trade (symbol, price, qty, "Time")
+  VALUES ${data.map(d =>
+    `('${d.data.s}', ${parseFloat(d.data.p)}, ${parseFloat(d.data.q)}, to_timestamp(${d.data.T} / 1000.0))`
+    ).join(",")}`;
+
         console.log("Inserted ",data.length);
         // clear buffer array 
         data = [];

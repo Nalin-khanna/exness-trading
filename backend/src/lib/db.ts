@@ -1,9 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import { Client } from "pg";
 
-declare global{
-    var prisma :PrismaClient | undefined;
-
-}
-export const db=globalThis.prisma || new PrismaClient();
-
-if(process.env.NODE_ENV!=="production")globalThis.prisma=db;
+export const client = new Client({
+  host: 'localhost',
+  port: 5434,
+  database: 'postgres',
+  user: 'postgres',
+  password: 'password'
+})
