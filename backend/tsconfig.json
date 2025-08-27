@@ -4,10 +4,10 @@
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
-
+    "moduleResolution": "bundler",
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
+    "module": "preserve",
     "target": "esnext",
     "types": [],
     // For nodejs:
@@ -23,7 +23,6 @@
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
     // Style Options
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,
