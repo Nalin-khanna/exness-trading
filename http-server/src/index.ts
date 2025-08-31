@@ -1,8 +1,10 @@
 import { pgclient } from "./lib.js";
 import express , {type Request , type Response} from "express";
+import { authRouter } from "./auth.js";
 const app = express();
 const port = 3000;
 app.use(express.json());
+app.use("/api/v1",authRouter)
 pgclient
   .connect()
   .then(() => console.log("Connected to TimescaleDB"))
@@ -18,14 +20,12 @@ app.get("/candles", async (req: Request, res: Response) => {
     else return res.status(400).json({ error: "Invalid time parameter" });
 
     try {
-        // Convert Unix timestamps (which are in seconds) to JavaScript Date objects
-        // The Date constructor expects milliseconds, so multiply by 1000
+        // Convert Unix timestamps to JavaScript Date objects
         const startDate = new Date(Number(startTime) * 1000);
         const endDate = new Date(Number(endTime) * 1000);
 
         const params = [asset, startDate, endDate];
 
-        // The query is now simpler, without to_timestamp
         const query = `SELECT open, high, low, close FROM ${viewName} 
             WHERE symbol = $1 AND bucket >= $2 AND bucket <= $3 
             ORDER BY bucket DESC;`;
@@ -39,6 +39,8 @@ app.get("/candles", async (req: Request, res: Response) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
+
 
 app.listen ( port , () => {
     console.log(`Server started at http://localhost:${port}`);
