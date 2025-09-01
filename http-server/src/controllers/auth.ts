@@ -2,10 +2,10 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { v4 } from "uuid";
 import {sign} from "jsonwebtoken"
+import { users } from "../config/common.ts";
 export const authRouter = Router();
-let users : any[] = [];
-const JWT_SECRET = process.env.JWT_SECRET!;
 
+const JWT_SECRET = process.env.JWT_SECRET!;
 authRouter.post("/signup" , async (req , res , next) => {
     const {email  , password } : {email : string , password : string} = req.body;
     if (email && password){
@@ -17,7 +17,12 @@ authRouter.post("/signup" , async (req , res , next) => {
                {email,
                 password : hashedpassword,
                 userId,
-                balance : 5000
+                balance : {
+                    usd : {
+                        tradable : 500000n , // 5000 USD 2 decimals 
+                        locked : 0
+                    }
+                }
             }
             )
             return res.status(200).json({userId: userId})
@@ -29,7 +34,6 @@ authRouter.post("/signup" , async (req , res , next) => {
         return res.status(403).json({message: "Error while signing up"})
     }
 })
-
 
 authRouter.post("signin" , (req,res , next)=>{
     const {email , password} = req.body;
@@ -48,8 +52,6 @@ authRouter.post("signin" , (req,res , next)=>{
         email : email ,
         userId : user.userId
     },JWT_SECRET); 
-
     user.token = jwt_token;
     return res.status(200).json({token : jwt_token})
-
 })

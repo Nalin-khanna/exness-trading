@@ -1,14 +1,28 @@
-import { pgclient } from "./lib.js";
+import { pgclient, redisClient } from "./config/lib.ts";
 import express , {type Request , type Response} from "express";
-import { authRouter } from "./auth.js";
+import { authRouter } from "./controllers/auth.ts";
+import {type PricesObject , Data} from "./config/common.ts";
 const app = express();
 const port = 3000;
-app.use(express.json());
-app.use("/api/v1",authRouter)
 pgclient
   .connect()
   .then(() => console.log("Connected to TimescaleDB"))
   .catch((err) => console.error("DB connection error:", err));
+await redisClient.connect()
+console.log("connected to redis")
+redisClient.subscribe("ticks" , (message : any)=> {
+    if(message.symbol){
+        let obj = Data.find(data => data.symbol === message.symbol);
+        if(obj){
+            obj.ask = message.ask;
+            obj.bid = message.bid;
+            obj.price = message.price
+        }
+    }
+})
+
+app.use(express.json());
+app.use("/api/v1",authRouter)
 
 app.get("/candles", async (req: Request, res: Response) => {
     let { asset, startTime, endTime, ts } = req.query;
@@ -39,7 +53,6 @@ app.get("/candles", async (req: Request, res: Response) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-
 
 
 app.listen ( port , () => {
