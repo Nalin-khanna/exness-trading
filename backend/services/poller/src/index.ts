@@ -1,4 +1,3 @@
-import type { WebSocket } from "bun";
 import { pgclient } from "./lib/common";
 import { setupContinousAggregate } from "./aggregate";
 import { publish } from "./pub";
@@ -7,10 +6,9 @@ async function main () {
     await pgclient.connect();
     await setupRedis();
     // await setupContinousAggregate();
-    const ws = new WebSocket("wss://fstream.binance.com/stream?streams=btcusdt@aggTrade");
+    const ws = new WebSocket("wss://fstream.binance.com/stream?streams=btcusdt@aggTrade/ethusdt@aggTrade/solusdt@aggTrade");
     ws.onopen = () => {
         console.log("connected");
-
     }
     let data : any[] = [];
 
@@ -18,11 +16,11 @@ async function main () {
         let object = JSON.parse(msg.data);
         data.push(object);
 
-        // creating bids and asks with 0.05% spread
+        // creating bids and asks with 0.1% spread
         const price = parseFloat(object.data.p);
-        const spreadPct = 0.0005; // 0.05%
-        const bid = price * (1 - spreadPct / 2);
-        const ask = price * (1 + spreadPct / 2);
+        const spread = 0.001; // 0.1%
+        const bid = price * (1 - spread / 2);
+        const ask = price * (1 + spread / 2);
         const payload = {
             symbol : object.data.s,
             bid : bid,

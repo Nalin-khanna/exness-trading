@@ -1,4 +1,4 @@
-import { Client } from "pg";
+import { Client } from "../../node_modules/@types/pg";
 import { createClient } from "redis";
 
 export const pgclient = new Client({

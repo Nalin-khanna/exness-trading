@@ -1,5 +1,5 @@
 import dotenv from "dotenv"
-import { Client } from "pg";
+import { Client } from "../../node_modules/@types/pg/index.js";
 import { createClient } from "redis";
 dotenv.config();
 export const config = {

@@ -2,7 +2,7 @@ import { pgclient, redisClient } from "./config/lib.ts";
 import express , {type Request , type Response} from "express";
 import { authRouter } from "./controllers/auth.ts";
 import {type PricesObject , Data} from "./config/common.ts";
-import { subscribe } from "./subscribe/subscribe.ts";
+import { subscribe } from "./subscribe/sub.ts";
 const app = express();
 const port = 3000;
 pgclient

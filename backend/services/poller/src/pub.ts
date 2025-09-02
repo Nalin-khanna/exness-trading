@@ -6,7 +6,6 @@ export const setupRedis = async () => {
 }
 
 export const publish = async (tick : any) => { 
-    console.log("Redis connected");
     await redisclient.publish('ticks', JSON.stringify(tick));
-    console.log("Published to Redis");
+
 }
